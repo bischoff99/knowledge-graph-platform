@@ -1,0 +1,61 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+ENV/
+.venv
+*.egg-info/
+dist/
+build/
+
+# Node
+node_modules/
+npm-debug.log
+yarn-error.log
+.npm
+.yarn
+
+# Neo4j
+infra/graph/neo4j/data/
+infra/graph/neo4j/logs/
+infra/graph/neo4j/plugins/
+
+# Fuseki
+infra/graph/fuseki/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Env
+.env
+.env.local
+
+# Logs
+*.log
+logs/
+
+# Snapshots (keep in ~/.kg-snapshots/)
+*.snapshot
+
+# Visualizations (generated)
+kg-viz.html
+
+# Coverage
+.coverage
+htmlcov/
+.pytest_cache/
+
+# Temp
+tmp/
+*.tmp

@@ -1,0 +1,25 @@
+{
+  "name": "kg-graphql-api",
+  "version": "1.0.0",
+  "description": "Knowledge Graph GraphQL API powered by Neo4j",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "dev": "node --watch index.js",
+    "start": "node index.js",
+    "test": "NODE_OPTIONS=--experimental-vm-modules jest"
+  },
+  "dependencies": {
+    "@neo4j/graphql": "^5.7.1",
+    "apollo-server": "^4.11.2",
+    "dotenv": "^16.4.5",
+    "graphql": "^16.9.0",
+    "neo4j-driver": "^5.25.0"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
