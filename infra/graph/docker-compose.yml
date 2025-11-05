@@ -1,5 +1,3 @@
-version: '3.9'
-
 services:
   neo4j:
     image: neo4j:5.22
@@ -18,8 +16,7 @@ services:
       - ./neo4j/data:/data
       - ./neo4j/logs:/logs
       - ./neo4j/plugins:/plugins
-      - ./schema:/var/lib/neo4j/import/schema
-      - ./seed:/var/lib/neo4j/import/seed
+      - ../../schema:/var/lib/neo4j/import/schema
 
   # Optional RDF/SPARQL track (uncomment to enable)
   # fuseki:
