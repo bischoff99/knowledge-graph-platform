@@ -76,3 +76,44 @@ clean:
 	@read -p "Are you sure? (yes/no): " confirm && [ "$$confirm" = "yes" ] || exit 1
 	cd infra/graph && docker compose down -v
 	@echo "🗑️  Data volumes deleted"
+
+
+# API servers
+start-apis:
+	@echo "🚀 Starting GraphQL + REST APIs..."
+	@echo "GraphQL: http://localhost:4000"
+	@echo "REST: http://localhost:8000"
+	cd api/graphql && npm run dev &
+	cd api/rest && source ../../venv/bin/activate && python main.py
+
+stop-apis:
+	@echo "🛑 Stopping APIs..."
+	pkill -f "node.*index.js" || true
+	pkill -f "uvicorn" || true
+
+# Performance
+benchmark:
+	@echo "⚡ Running performance benchmarks..."
+	source venv/bin/activate && python ops/benchmark.py
+
+# Data Quality
+qa:
+	@echo "🔍 Running data quality checks..."
+	source venv/bin/activate && python governance/data_qa.py
+
+test:
+	@echo "🧪 Running schema tests..."
+	source venv/bin/activate && pytest governance/schema_tests.py -v
+
+# Operations
+backup:
+	@echo "💾 Creating backup..."
+	./ops/backup.sh
+
+migrations:
+	@echo "🔄 Running pending migrations..."
+	source venv/bin/activate && python ops/run_migrations.py
+
+# Full check
+check: test qa health
+	@echo "✅ All checks passed"

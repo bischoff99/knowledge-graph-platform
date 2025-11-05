@@ -1,0 +1,48 @@
+# Example ETL Job Configuration
+# Loads MCP memory entities into Neo4j
+
+name: mcp_memory_sync
+description: Sync MCP memory entities to Neo4j knowledge graph
+source:
+  type: json
+  connection:
+    path: /tmp/mcp-memory-export.json
+
+entity_mappings:
+  - label: Project
+    id_field: name
+    properties:
+      - source_field: name
+        target_property: name
+      - source_field: entityType
+        target_property: entity_type
+      - source_field: status
+        target_property: status
+        default: active
+    tags_field: tags
+    meta_fields:
+      source: mcp_memory
+      import_date: now()
+
+  - label: Tool
+    id_field: name
+    properties:
+      - source_field: name
+        target_property: name
+      - source_field: description
+        target_property: description
+    meta_fields:
+      source: mcp_memory
+
+relationship_mappings:
+  - type: DEPENDS_ON
+    from_field: from_entity
+    to_field: to_entity
+    properties:
+      - source_field: established_date
+        target_property: established
+        transform: timestamp
+
+batch_size: 1000
+parallel_workers: 16
+upsert_strategy: MERGE

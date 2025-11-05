@@ -1,0 +1,89 @@
+name: Knowledge Graph Platform CI
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main]
+
+jobs:
+  schema-tests:
+    runs-on: ubuntu-latest
+    
+    services:
+      neo4j:
+        image: neo4j:5.22
+        env:
+          NEO4J_AUTH: neo4j/test1234
+        ports:
+          - 7687:7687
+        options: >-
+          --health-cmd "cypher-shell -u neo4j -p test1234 'RETURN 1'"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt
+          pip install pytest pytest-cov
+      
+      - name: Apply schema
+        run: |
+          cat schema/init-schema.cypher | cypher-shell -u neo4j -p test1234 -a bolt://localhost:7687
+      
+      - name: Load seed data
+        run: |
+          cat schema/seed-data.cypher | cypher-shell -u neo4j -p test1234 -a bolt://localhost:7687
+      
+      - name: Run schema tests
+        run: |
+          pytest governance/schema_tests.py -v --cov=governance --cov-report=xml
+      
+      - name: Run data QA
+        run: |
+          python governance/data_qa.py
+
+  lint:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      
+      - name: Lint Python
+        run: |
+          pip install ruff
+          ruff check ingestion/ api/rest/ ops/ governance/
+      
+      - name: Lint TypeScript (GraphQL)
+        run: |
+          cd api/graphql
+          npm install
+          npm run lint || true  # Add lint script to package.json
+  
+  security:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Security scan Python
+        run: |
+          pip install safety
+          safety check -r requirements.txt
+      
+      - name: Security scan Node
+        run: |
+          cd api/graphql
+          npm audit --production
